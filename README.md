@@ -1,7 +1,7 @@
 ## CPhysicsEngine
 A Physics Engine implemented with C and SDL2
 
-[![Bouncy balls]](img/ballpit.gif)
+![Bouncy balls](img/ballpit.gif)
 
 -----
 
