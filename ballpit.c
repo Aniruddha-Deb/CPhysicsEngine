@@ -204,6 +204,10 @@ int main_loop() {
 		SDL_RenderPresent(renderer);
 	}
 	
+	for (int i=0; i<nballs; i++) {
+		destroy_ball(balls[i]);
+	}
+
 	SDL_DestroyWindow(w);
 	SDL_Quit();
 	return 0;
