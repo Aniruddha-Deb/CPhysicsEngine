@@ -10,6 +10,20 @@
 #define SCREEN_HEIGHT 480
 #define SCREEN_TITLE "Ballpit"
 
+// a low coefficient of restitution causes a lot of bugs: the engine is 
+// not meant to handle deformations etc. The balls 'slide' into one another
+// with a very low e
+//
+// one more thing is that the ticrate needs to be quite high, otherwise 
+// bugs galore. This is not good as I am using muscle power to compensate for
+// a poor algorithm. I'll need to think of a better collision algorithm, but
+// that is not a high priority now. 
+// 
+// One solution is to run as fast as the system will allow, using a variable
+// tic rate and render the circles independently (only when their position
+// changes) rather than rendering them all at once.
+// This needs more thought. A lot more thought.
+
 #define E 1 // Coefficient of Restitution
 
 typedef struct {
@@ -37,7 +51,6 @@ void destroy_ball(Ball *b) {
 }
 
 void recompute_post_collision(Ball *b1, Ball *b2) {
-	// TODO compute new velocities.	
 	// first, find the direction of common normal: from b1_pos to b2_pos
 	Vector2 *b2pos = vec2_dup(b2->pos);
 	vec2_subtract(b2pos, b1->pos);
@@ -78,6 +91,7 @@ void handle_collisions(const int nb, Ball **b) {
 		}
 	}
 	// then handle ball-wall collisions
+	// TODO incorporate E in ball-wall collisions as well.
 	for (int i=0; i<nb; i++) {
 		if (b[i]->pos->x <= b[i]->r || b[i]->pos->x >= SCREEN_WIDTH-b[i]->r) {
 			b[i]->v->x *= -1; // reverse velocity along x-axis
@@ -117,6 +131,7 @@ void sym_render_pts(SDL_Renderer *renderer, int x, int y, int dx, int dy) {
 }
 
 int iroundf(float f) {
+	// can be optimized as return (int)(f+0.5)
 	int i = (int)f; // floor(f)
 	if (f-i >= 0.5f) return i+1;
 	else return i;
@@ -170,7 +185,7 @@ int main_loop() {
 	SDL_Event e;
 	bool quit = false;
 	bool startAnim = false;
-	const int ticrate = 10;
+	const int ticrate = 1;
 
 	SDL_Window *w = SDL_CreateWindow(SCREEN_TITLE, 
 									 SDL_WINDOWPOS_CENTERED, 
@@ -222,5 +237,3 @@ int main() {
 	}
 	return 0;
 }
-// TODO subpixel correct ball rendering with SDL
-// TODO SDL init, main loop, animation.
